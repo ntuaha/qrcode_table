@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>桌號資訊</title>
+  <script src="vue.js"></script>
+  <script src="data.js"></script>
+</head>
+<body>
+  <div id="app">
+    <h1>{{ currentName }}</h1>
+    <p>Site: {{ currentSite }}</p>
+    <p>Key: {{ currentKey }}</p>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+
+
+    createApp({
+      data() {
+        return {
+          currentName: '',
+          currentSite: '',
+          currentKey: ''
+        }
+      },
+      created() {
+        this.updateContentBasedOnURL();
+        window.addEventListener('popstate', this.updateContentBasedOnURL);
+      },
+      beforeUnmount() {
+        window.removeEventListener('popstate', this.updateContentBasedOnURL);
+      },
+      methods: {
+        updateContentBasedOnURL() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const key = urlParams.get('key');
+
+          if (key) {
+            const item = data.find(entry => entry.key === key);
+            if (item) {
+              this.currentName = item.name;
+              this.currentSite = item.site;
+              this.currentKey = item.key;
+            } else {
+              this.currentName = 'Not Found';
+              this.currentSite = '';
+              this.currentKey = '';
+            }
+          } else {
+            this.currentName = 'Home Page';
+            this.currentSite = '';
+            this.currentKey = 'n/a';
+          }
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
